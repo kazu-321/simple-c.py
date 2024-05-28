@@ -48,7 +48,7 @@ class compiler:
         self.assignment("__substr.counter",start)
         self.assignment(return_variable,"")
         for _ in range(end-start+1):
-            self.assignment(self.V_VALUE[self.V_NAMES.index(return_variable)],self.V_VALUE[self.V_NAMES.index(return_variable)]+value[self.V_VALUE[self.V_NAMES.index("__substr.counter")]])
+            self.assignment(return_variable,self.V_VALUE[self.V_NAMES.index(return_variable)]+value[self.V_VALUE[self.V_NAMES.index("__substr.counter")]])
             self.increase("__substr.counter")
         self.remove_variable("__substr.counter")
 
@@ -111,8 +111,7 @@ class compiler:
                     return
                 self.increase("__is_variable.counter")
             self.assignment(return_variable,1)
-            self.remove_variable("__is_variable.counter")
-            if value[len(value)] not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789":
+            if value[len(value)-1] not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789":
                 self.assignment(return_variable,0)
                 self.remove_variable("__is_variable.counter")
                 return
@@ -120,7 +119,6 @@ class compiler:
             self.remove_variable("__is_variable.counter")
             return
         self.assignment(return_variable,0)
-        self.remove_variable("__is_variable.counter")
     
     def operation(self,value1,value2,op,return_variable):
         self.initialize_variable("int","__operation.counter")
@@ -132,7 +130,7 @@ class compiler:
                     self.remove_variable("__operation.counter")
                     return
                 if op=="+":
-                    self.assignment(return_variable,value1+value2)
+                    self.assignment(return_variable,int(value1)+int(value2))
                     self.remove_variable("__operation.counter")
                     return
                 if op=="-":
@@ -187,8 +185,8 @@ class compiler:
                 self.initialize_variable("string","__evaluate.value2"+str(id))
                 self.initialize_variable("int","__evaluate.op_index" +str(id))
                 self.indexchar(value,self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter"+str(id))]],"__evaluate.op_index"+str(id))
-                self.substr(value,0,self.V_VALUE[self.V_NAMES.index("__evaluate.op_index"+str(id))],"__evaluate.value1"+str(id))
-                self.substr(value,self.V_VALUE[self.V_NAMES.index("__evaluate.op_index"+str(id))]+1,len(value),"__evaluate.value2"+str(id))
+                self.substr(value,0,int(self.V_VALUE[self.V_NAMES.index("__evaluate.op_index"+str(id))]-1),"__evaluate.value1"+str(id))
+                self.substr(value,int(self.V_VALUE[self.V_NAMES.index("__evaluate.op_index"+str(id))])+1,len(value)-1,"__evaluate.value2"+str(id))
                 self.evaluate(self.V_VALUE[self.V_NAMES.index("__evaluate.value1"+str(id))],id+1,"__evaluate.value1"+str(id))
                 self.evaluate(self.V_VALUE[self.V_NAMES.index("__evaluate.value2"+str(id))],id+1,"__evaluate.value2"+str(id))
                 self.operation(self.V_VALUE[self.V_NAMES.index("__evaluate.value1"+str(id))],self.V_VALUE[self.V_NAMES.index("__evaluate.value2"+str(id))],self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter"+str(id))]],return_variable)
@@ -219,6 +217,8 @@ class compiler:
                 return
             self.increase("__compile.types_counter")
         self.evaluate(code,0,"")
+        self.remove_variable("__compile.types_counter")
+
 
     def compile(self):
         global CODE
@@ -226,11 +226,12 @@ class compiler:
         self.initialize_variable("int","__compile.counter")
         self.assignment("__compile.counter",0)
         for _ in range(len(CODE)):
-            self.compile_line(CODE[self.V_VALUE[self.V_NAMES.index("__compile.counter")]])
+            self.compile_line(CODE[self.V_VALUE[self.V_NAMES.index("__compile.counter")]][:-1])
             self.increase("__compile.counter")
         self.remove_variable("__compile.counter")
+        print(self.V_NAMES)
+        print(self.V_VALUE)
+
 
 c=compiler()
 c.compile()
-print(c.V_NAMES)
-print(c.V_VALUE)
