@@ -61,6 +61,22 @@ class compiler:
                 return
             self.increase("__findchar.counter")
         self.remove_variable("__findchar.counter")
+    
+    def findstr(self,value,str,return_variable):
+        self.initialize_variable("int","__findstr.counter")
+        self.assignment("__findstr.counter",0)
+        self.assignment(return_variable,-1)
+        self.initialize_variable("string","__findstr.sub")
+        for _ in range(len(value)-len(str)):
+            self.substr(value,self.V_VALUE[self.V_NAMES.find("__findstr.counter")],len(str),"__findstr.sub")
+            if self.V_VALUE[self.V_NAMES.find("__findstr.sub")]==str:
+                self.assignment(return_variable,self.V_VALUE[self.V_NAMES.find("__findstr.counter")])
+                self.remove_variable("__findstr.counter")
+                self.remove_variable("__findstr.sub")
+                return
+            self.increase("__findstr.counter")
+        self.remove_variable("__findstr.counter")
+        self.remove_variable("__findstr.sub")
 
     def is_string(self,value,return_variable):
         if value[0]=='"' and value[len(value)-1]=='"':
@@ -185,6 +201,24 @@ class compiler:
 
 
     def compile_line(self,code):
+        self.initialize_variable("int","__compile.types_counter")
+        self.assignment("__compile.types_counter",0)
+        for _ in range(len(self.TYPES)):
+            if self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]] in code:
+                self.initialize_variable("string","__compile.variable")
+                self.initialize_variable("string","__compile.value")
+                self.initialize_variable("int","__compile.variable_index")
+                self.findchar(code,self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]],"__compile.variable_index")
+                self.substr(code,self.V_VALUE[self.V_NAMES.find("__compile.variable_index")]+len(self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]]),len(code),"__compile.variable")
+                self.evaluate(self.V_VALUE[self.V_NAMES.find("__compile.variable")],0,"__compile.value")
+                self.initialize_variable(self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]],self.V_VALUE[self.V_NAMES.find("__compile.variable")])
+                self.assignment(self.V_VALUE[self.V_NAMES.find("__compile.variable")],self.V_VALUE[self.V_NAMES.find("__compile.value")])
+                self.remove_variable("__compile.variable")
+                self.remove_variable("__compile.value")
+                self.remove_variable("__compile.variable_index")
+                self.remove_variable("__compile.types_counter")
+                return
+            self.increase("__compile.types_counter")
         self.evaluate(code,0,"")
 
     def compile(self):
