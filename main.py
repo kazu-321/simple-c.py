@@ -7,18 +7,15 @@ CODE=[
 # So, I must use easy(decreased in scratch) code.
 class compiler:
     def __init__(self):
-        self.V_NAMES=[]
-        self.V_TYPES=[]
-        self.V_VALUE=[]
-        self.OPERATION=["=","+","-","*","/","%"]
-        self.COMPILE_LINE=1
-        self.COMPILE_NOW=1
+        self.initialize_compiler()
 
     def initialize_compiler(self):
         self.V_NAMES=[]
         self.V_TYPES=[]
         self.V_VALUE=[]
         self.OPERATION=["=","+","-","*","/","%"]
+        self.TYPES=["int","string","float","double","char"]
+        self.FUNKS=["printf","scanf","if","while","for","switch","case","break","continue","return","else"]
         self.COMPILE_LINE=0
         self.COMPILE_NOW=0
 
@@ -186,17 +183,16 @@ class compiler:
             self.increase("__evaluate.operation_counter"+str(id))
         self.remove_variable("__evaluate.operation_counter"+str(id))
 
+
+    def compile_line(self,code):
+        self.evaluate(code,0,"")
+
     def compile(self):
         global CODE
         self.initialize_compiler()
         self.initialize_variable("int","__compile.counter")
         self.assignment("__compile.counter",0)
         for _ in range(len(CODE)):
-            self.evaluate(CODE[self.V_VALUE[self.V_NAMES.find("__compile.counter")]],0,"")
+            self.compile_line(CODE[self.V_VALUE[self.V_NAMES.find("__compile.counter")]])
             self.increase("__compile.counter")
         self.remove_variable("__compile.counter")
-
-c=compiler.compile()
-print(c.V_NAMES)
-print(c.V_TYPES)
-print(c.V_VALUE)
