@@ -203,11 +203,18 @@ class compiler:
     def compile_line(self,code):
         self.initialize_variable("int","__compile.types_counter")
         self.assignment("__compile.types_counter",0)
+        self.initialize_variable("string","__compile.code_sub")
         for _ in range(len(self.TYPES)):
-            self.initialize_variable("string","__compile.types_include")
-            self.findstr(code,self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]],"__compile.types_include")
-            if self.V_VALUE[self.V_NAME.find("__compile.types_include")]==1:
-                
+            self.substr(code,0,len(self.OPERATION(self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]))+1,"__compile.code_sub")
+            if self.V_VALUE[self.V_NAMES.find("__compile.code_sub")]==self.OPERATION(self.V_VALUE[self.V_NAMES.find("__compile.types_counter")])+" ":
+                self.initialize_variable("string","__compile.variable")
+                if "=" in code:
+                    pass
+                self.substr(code,len(self.OPERATION(self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]))+1,len(code),"__compile.variable")
+                self.initialize_variable(self.OPERATION(self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]),self.V_VALUE[self.V_NAMES.find("__compile.variable")])
+                self.remove_variable("__compile.variable")
+                self.remove_variable("__compile.code_sub")
+                self.remove_variable("__compile.types_counter")
                 return
             self.increase("__compile.types_counter")
         self.evaluate(code,0,"")
