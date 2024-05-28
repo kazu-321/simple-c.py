@@ -186,7 +186,7 @@ class compiler:
                 self.initialize_variable("string","__evaluate.value1"+str(id))
                 self.initialize_variable("string","__evaluate.value2"+str(id))
                 self.initialize_variable("int","__evaluate.op_index" +str(id))
-                self.indexchar(value,self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter")]],"__evaluate.op_index"+str(id))
+                self.indexchar(value,self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter"+str(id))]],"__evaluate.op_index"+str(id))
                 self.substr(value,0,self.V_VALUE[self.V_NAMES.index("__evaluate.op_index"+str(id))],"__evaluate.value1"+str(id))
                 self.substr(value,self.V_VALUE[self.V_NAMES.index("__evaluate.op_index"+str(id))]+1,len(value),"__evaluate.value2"+str(id))
                 self.evaluate(self.V_VALUE[self.V_NAMES.index("__evaluate.value1"+str(id))],id+1,"__evaluate.value1"+str(id))
