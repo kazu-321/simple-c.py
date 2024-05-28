@@ -140,7 +140,7 @@ class compiler:
             self.increase("__operation.counter")
         self.remove_variable("__operation.counter")
 
-    def evaluate(self,value,return_variable):
+    def evaluate(self,value,id,return_variable):
         self.initialize_variable("int","__evaluate.is_int")
         self.is_int(value,"__evaluate.is_int")
         if self.V_VALUE[self.V_NAMES.find("__evaluate.is_int")]==1:
@@ -165,22 +165,27 @@ class compiler:
             self.remove_variable("__evaluate.is_variable")
             return
         self.remove_variable("__evaluate.is_variable")
-        self.initialize_variable("int","__evaluate.operation_counter")
-        self.assignment("__evaluate.operation_counter",0)
+        self.initialize_variable("int","__evaluate.operation_counter"+str(id))
+        self.assignment("__evaluate.operation_counter"+str(id),0)
         for _ in range(len(self.OPERATION)):
-            self.initialize_variable("int","__evaluate.is_operation")
-            if self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter")]] in value:
-                self.initialize_variable("string","__evaluate.value1")
-                self.initialize_variable("string","__evaluate.value2")
-                self.initialize_variable("int","__evaluate.op_index")
-                self.findchar(value,self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter")]],"__evaluate.op_index")
-                self.substr(value,0,self.V_VALUE[self.V_NAMES.find("__evaluate.op_index")],"__evaluate.value1")
-                self.substr(value,self.V_VALUE[self.V_NAMES.find("__evaluate.op_index")]+1,len(value),"__evaluate.value2")
-                self.evaluate(self.V_VALUE[self.V_NAMES.find("__evaluate.value1")],self.V_VALUE[self.V_NAMES.find("__evaluate.value2")],self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter")]],return_variable)
-                self.remove_variable("__evaluate.operation_counter")
+            if self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter"+str(id))]] in value:
+                self.initialize_variable("string","__evaluate.value1"+str(id))
+                self.initialize_variable("string","__evaluate.value2"+str(id))
+                self.initialize_variable("int","__evaluate.op_index" +str(id))
+                self.findchar(value,self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter")]],"__evaluate.op_index"+str(id))
+                self.substr(value,0,self.V_VALUE[self.V_NAMES.find("__evaluate.op_index"+str(id))],"__evaluate.value1"+str(id))
+                self.substr(value,self.V_VALUE[self.V_NAMES.find("__evaluate.op_index"+str(id))]+1,len(value),"__evaluate.value2"+str(id))
+                self.evaluate(self.V_VALUE[self.V_NAMES.find("__evaluate.value1"+str(id))],id+1,"__evaluate.value1"+str(id))
+                self.evaluate(self.V_VALUE[self.V_NAMES.find("__evaluate.value2"+str(id))],id+1,"__evaluate.value2"+str(id))
+                self.operation(self.V_VALUE[self.V_NAMES.find("__evaluate.value1"+str(id))],self.V_VALUE[self.V_NAMES.find("__evaluate.value2"+str(id))],self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter"+str(id))]],return_variable)
+                self.remove_variable("__evaluate.value1"+str(id))
+                self.remove_variable("__evaluate.value2"+str(id))
+                self.remove_variable("__evaluate.op_index"+str(id))
+                self.remove_variable("__evaluate.operation_counter"+str(id))
                 return
-            self.increase("__evaluate.operation_counter")
-        self.remove_variable("__evaluate.operation_counter")
+            self.increase("__evaluate.operation_counter"+str(id))
+        self.remove_variable("__evaluate.operation_counter"+str(id))
+        
 
     def compile_line(self,code):
         self.initialize_variable("int","__compile_line.counter")
