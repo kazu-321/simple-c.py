@@ -45,35 +45,42 @@ class compiler:
     def increase(self,V_NAMES):
         self.assignment(V_NAMES,self.V_VALUE[self.V_NAMES.find(V_NAMES)]+1)
 
-    def substr(self,str,start,end,return_variable):
+    def substr(self,value,start,end,return_variable):
         self.initialize_variable("int","__substr.counter")
         self.assignment("__substr.counter",start)
         self.assignment(return_variable,"")
         for _ in range(end-start+1):
-            self.assignment(self.V_VALUE[self.V_NAMES.find(return_variable)],self.V_VALUE[self.V_NAMES.find(return_variable)]+str[self.V_VALUE[self.V_NAMES.find("__substr.counter")]])
+            self.assignment(self.V_VALUE[self.V_NAMES.find(return_variable)],self.V_VALUE[self.V_NAMES.find(return_variable)]+value[self.V_VALUE[self.V_NAMES.find("__substr.counter")]])
             self.increase("__substr.counter")
         self.remote_variable("__substr.counter")
 
-    def findchar(self,str,char,return_variable):
+    def findchar(self,value,char,return_variable):
         self.initialize_variable("int","__findchar.counter")
         self.assignment("__findchar.counter",0)
         self.assignment(return_variable,-1)
-        for _ in str:
-            if str[self.V_VALUE[self.V_NAMES.find("__findchar.counter")]]==char:
+        for _ in value:
+            if value[self.V_VALUE[self.V_NAMES.find("__findchar.counter")]]==char:
                 self.assignment(return_variable,self.V_VALUE[self.V_NAMES.find("__findchar.counter")])
                 return
             self.increase("__findchar.counter")
         self.remote_variable("__findchar.counter")
 
-    def is_string(self,str,return_variable):
-        if str[0]=='"' and str[len(str)-1]=='"':
+    def is_string(self,value,return_variable):
+        if value[0]=='"' and value[len(value)-1]=='"':
             self.assignment(return_variable,1)
         else:
             self.assignment(return_variable,0)
+    
+    def is_int(self,value,return_variable):
         
     def evaluate(self,value):
         self.initialize_variable("int","__evaluate.is_string")
-        
+        if self.is_string(value,"__evaluate.is_string")==1:
+            self.substr(value,1,len(value)-2,value)
+            self.remote_variable("__evaluate.is_string")
+            return
+        self.remote_variable("__evaluate.is_string")
+
 
     def compile_line(self,code):
         self.initialize_variable("int","__compile_line.counter")
