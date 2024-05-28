@@ -14,7 +14,7 @@ class compiler:
         self.V_NAMES=[]
         self.V_TYPES=[]
         self.V_VALUE=[]
-        self.OPERATION=["=","+","-","*","/","%"]
+        self.OPERATIONS=["=","+","-","*","/","%"]
         self.TYPES=["int","string","float","double","char"]
         self.FUNKS=["printf","scanf","if","while","for","switch","case","break","continue","return","else"]
         self.COMPILE_LINE=0
@@ -36,9 +36,9 @@ class compiler:
             self.V_TYPES[rm]=self.V_TYPES[len(self.V_TYPES)-1]
             self.V_NAMES[rm]=self.V_NAMES[len(self.V_NAMES)-1]
             self.V_VALUE[rm]=self.V_VALUE[len(self.V_VALUE)-1]
-        self.V_TYPES[len(self.V_TYPES)-1].pop(-1)
-        self.V_NAMES[len(self.V_NAMES)-1].pop(-1)
-        self.V_VALUE[len(self.V_VALUE)-1].pop(-1)
+        self.V_TYPES.pop(-1)
+        self.V_NAMES.pop(-1)
+        self.V_VALUE.pop(-1)
 
     def increase(self,V_NAMES):
         self.assignment(V_NAMES,self.V_VALUE[self.V_NAMES.index(V_NAMES)]+1)
@@ -125,8 +125,8 @@ class compiler:
     def operation(self,value1,value2,op,return_variable):
         self.initialize_variable("int","__operation.counter")
         self.assignment("__operation.counter",0)
-        for _ in range(len(self.OPERATION)):
-            if self.OPERATION[self.V_VALUE[self.V_NAMES.index("__operation.counter")]]==op:
+        for _ in range(len(self.OPERATIONS)):
+            if self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__operation.counter")]]==op:
                 if op=="=":
                     self.assignment(value1,value2)
                     self.remove_variable("__operation.counter")
@@ -181,17 +181,17 @@ class compiler:
         self.remove_variable("__evaluate.is_variable")
         self.initialize_variable("int","__evaluate.operation_counter"+str(id))
         self.assignment("__evaluate.operation_counter"+str(id),0)
-        for _ in range(len(self.OPERATION)):
-            if self.OPERATION[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter"+str(id))]] in value:
+        for _ in range(len(self.OPERATIONS)):
+            if self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter"+str(id))]] in value:
                 self.initialize_variable("string","__evaluate.value1"+str(id))
                 self.initialize_variable("string","__evaluate.value2"+str(id))
                 self.initialize_variable("int","__evaluate.op_index" +str(id))
-                self.indexchar(value,self.OPERATION[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter")]],"__evaluate.op_index"+str(id))
+                self.indexchar(value,self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter")]],"__evaluate.op_index"+str(id))
                 self.substr(value,0,self.V_VALUE[self.V_NAMES.index("__evaluate.op_index"+str(id))],"__evaluate.value1"+str(id))
                 self.substr(value,self.V_VALUE[self.V_NAMES.index("__evaluate.op_index"+str(id))]+1,len(value),"__evaluate.value2"+str(id))
                 self.evaluate(self.V_VALUE[self.V_NAMES.index("__evaluate.value1"+str(id))],id+1,"__evaluate.value1"+str(id))
                 self.evaluate(self.V_VALUE[self.V_NAMES.index("__evaluate.value2"+str(id))],id+1,"__evaluate.value2"+str(id))
-                self.operation(self.V_VALUE[self.V_NAMES.index("__evaluate.value1"+str(id))],self.V_VALUE[self.V_NAMES.index("__evaluate.value2"+str(id))],self.OPERATION[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter"+str(id))]],return_variable)
+                self.operation(self.V_VALUE[self.V_NAMES.index("__evaluate.value1"+str(id))],self.V_VALUE[self.V_NAMES.index("__evaluate.value2"+str(id))],self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__evaluate.operation_counter"+str(id))]],return_variable)
                 self.remove_variable("__evaluate.value1"+str(id))
                 self.remove_variable("__evaluate.value2"+str(id))
                 self.remove_variable("__evaluate.op_index"+str(id))
@@ -206,13 +206,13 @@ class compiler:
         self.assignment("__compile.types_counter",0)
         self.initialize_variable("string","__compile.code_sub")
         for _ in range(len(self.TYPES)):
-            self.substr(code,0,len(self.OPERATION[self.V_VALUE[self.V_NAMES.index("__compile.types_counter")]])+1,"__compile.code_sub")
-            if self.V_VALUE[self.V_NAMES.index("__compile.code_sub")]==self.OPERATION(self.V_VALUE[self.V_NAMES.index("__compile.types_counter")])+" ":
+            self.substr(code,0,len(self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__compile.types_counter")]])+1,"__compile.code_sub")
+            if self.V_VALUE[self.V_NAMES.index("__compile.code_sub")]==self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__compile.types_counter")]]+" ":
                 self.initialize_variable("string","__compile.variable")
                 if "=" in code:
                     pass
-                self.substr(code,len(self.OPERATION(self.V_VALUE[self.V_NAMES.index("__compile.types_counter")]))+1,len(code),"__compile.variable")
-                self.initialize_variable(self.OPERATION(self.V_VALUE[self.V_NAMES.index("__compile.types_counter")]),self.V_VALUE[self.V_NAMES.index("__compile.variable")])
+                self.substr(code,len(self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__compile.types_counter")]])+1,len(code),"__compile.variable")
+                self.initialize_variable(self.OPERATIONS[self.V_VALUE[self.V_NAMES.index("__compile.types_counter")]],self.V_VALUE[self.V_NAMES.index("__compile.variable")])
                 self.remove_variable("__compile.variable")
                 self.remove_variable("__compile.code_sub")
                 self.remove_variable("__compile.types_counter")
