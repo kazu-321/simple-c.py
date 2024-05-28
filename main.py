@@ -72,7 +72,20 @@ class compiler:
             self.assignment(return_variable,0)
     
     def is_int(self,value,return_variable):
-        
+        if value[0] in "-0123456789":
+            self.initialize_variable("int","__is_int.counter")
+            self.assignment("__is_int.counter",0)
+            for _ in range(len(value)-1):
+                if value[self.V_VALUE[self.V_NAMES.find("__is_int.counter")]] not in "0123456789":
+                    self.assignment(return_variable,0)
+                    self.remote_variable("__is_int.counter")
+                    return
+                self.increase("__is_int.counter")
+            self.assignment(return_variable,1)
+            self.remote_variable("__is_int.counter")
+        else:
+            self.assignment(return_variable,0)   
+
     def evaluate(self,value):
         self.initialize_variable("int","__evaluate.is_string")
         if self.is_string(value,"__evaluate.is_string")==1:
