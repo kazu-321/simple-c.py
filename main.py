@@ -195,3 +195,8 @@ class compiler:
             self.evaluate(CODE[self.V_VALUE[self.V_NAMES.find("__compile.counter")]],0,"")
             self.increase("__compile.counter")
         self.remove_variable("__compile.counter")
+
+c=compiler.compile()
+print(c.V_NAMES)
+print(c.V_TYPES)
+print(c.V_VALUE)
