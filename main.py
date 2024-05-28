@@ -32,7 +32,7 @@ class compiler:
         if V_NAMES in self.V_NAMES:
             self.V_VALUE[self.V_NAMES.find(V_NAMES)]=v_value
     
-    def remote_variable(self,V_NAMES):
+    def remove_variable(self,V_NAMES):
         rm=self.V_NAMES.find(V_NAMES)
         if len(self.V_NAMES)>rm:
             self.V_TYPES[rm]=self.V_TYPES[len(self.V_TYPES)]
@@ -52,7 +52,7 @@ class compiler:
         for _ in range(end-start+1):
             self.assignment(self.V_VALUE[self.V_NAMES.find(return_variable)],self.V_VALUE[self.V_NAMES.find(return_variable)]+value[self.V_VALUE[self.V_NAMES.find("__substr.counter")]])
             self.increase("__substr.counter")
-        self.remote_variable("__substr.counter")
+        self.remove_variable("__substr.counter")
 
     def findchar(self,value,char,return_variable):
         self.initialize_variable("int","__findchar.counter")
@@ -63,7 +63,7 @@ class compiler:
                 self.assignment(return_variable,self.V_VALUE[self.V_NAMES.find("__findchar.counter")])
                 return
             self.increase("__findchar.counter")
-        self.remote_variable("__findchar.counter")
+        self.remove_variable("__findchar.counter")
 
     def is_string(self,value,return_variable):
         if value[0]=='"' and value[len(value)-1]=='"':
@@ -78,34 +78,114 @@ class compiler:
             for _ in range(len(value)-1):
                 if value[self.V_VALUE[self.V_NAMES.find("__is_int.counter")]] not in "0123456789":
                     self.assignment(return_variable,0)
-                    self.remote_variable("__is_int.counter")
+                    self.remove_variable("__is_int.counter")
                     return
                 self.increase("__is_int.counter")
             self.assignment(return_variable,1)
-            self.remote_variable("__is_int.counter")
+            self.remove_variable("__is_int.counter")
         else:
             self.assignment(return_variable,0)   
 
-    def evaluate(self,value):
-        self.initialize_variable("int","__evaluate.is_string")
-        if self.is_string(value,"__evaluate.is_string")==1:
-            self.substr(value,1,len(value)-2,value)
-            self.remote_variable("__evaluate.is_string")
+    def is_variable(self,value,return_variable):
+        if value[0] in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":
+            self.initialize_variable("int","__is_variable.counter")
+            self.assignment("__is_variable.counter",0)
+            for _ in range(len(value)-2):
+                if value[self.V_VALUE[self.V_NAMES.find("__is_variable.counter")]] not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.":
+                    self.assignment(return_variable,0)
+                    self.remove_variable("__is_variable.counter")
+                    return
+                self.increase("__is_variable.counter")
+            self.assignment(return_variable,1)
+            self.remove_variable("__is_variable.counter")
+            if value[len(value)] not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789":
+                self.assignment(return_variable,0)
+                self.remove_variable("__is_variable.counter")
+                return
+            self.assignment(return_variable,1)
+            self.remove_variable("__is_variable.counter")
             return
-        self.remote_variable("__evaluate.is_string")
+        self.assignment(return_variable,0)
+        self.remove_variable("__is_variable.counter")
+    
+    def operation(self,value1,value2,op,return_variable):
+        self.initialize_variable("int","__operation.counter")
+        self.assignment("__operation.counter",0)
+        for _ in range(len(self.OPERATION)):
+            if self.OPERATION[self.V_VALUE[self.V_NAMES.find("__operation.counter")]]==op:
+                if op=="=":
+                    self.assignment(value1,value2)
+                    self.remove_variable("__operation.counter")
+                    return
+                if op=="+":
+                    self.assignment(return_variable,value1+value2)
+                    self.remove_variable("__operation.counter")
+                    return
+                if op=="-":
+                    self.assignment(return_variable,value1-value2)
+                    self.remove_variable("__operation.counter")
+                    return
+                if op=="*":
+                    self.assignment(return_variable,value1*value2)
+                    self.remove_variable("__operation.counter")
+                    return
+                if op=="/":
+                    self.assignment(return_variable,value1/value2)
+                    self.remove_variable("__operation.counter")
+                    return
+                if op=="%":
+                    self.assignment(return_variable,value1%value2)
+                    self.remove_variable("__operation.counter")
+                    return
+            self.increase("__operation.counter")
+        self.remove_variable("__operation.counter")
 
+    def evaluate(self,value,return_variable):
+        self.initialize_variable("int","__evaluate.is_int")
+        self.is_int(value,"__evaluate.is_int")
+        if self.V_VALUE[self.V_NAMES.find("__evaluate.is_int")]==1:
+            self.assignment(return_variable,int(value))
+            self.remove_variable("__evaluate.is_int")
+            return
+        self.remove_variable("__evaluate.is_int")
+        self.initialize_variable("int","__evaluate.is_string")
+        self.is_string(value,"__evaluate.is_string")
+        if self.V_VALUE[self.V_NAMES.find("__evaluate.is_string")]==1:
+            self.substr(value,1,len(value)-2,return_variable)
+            self.remove_variable("__evaluate.is_string")
+            return
+        self.remove_variable("__evaluate.is_string")
+        self.initialize_variable("int","__evaluate.is_variable")
+        self.is_variable(value,"__evaluate.is_variable")
+        if self.V_VALUE[self.V_NAMES.find("__evaluate.is_variable")]==1:
+            if value in self.V_NAMES:
+                self.assignment(return_variable,self.V_VALUE[self.V_NAMES.find(value)])
+                self.remove_variable("__evaluate.is_variable")
+                return
+            self.remove_variable("__evaluate.is_variable")
+            return
+        self.remove_variable("__evaluate.is_variable")
+        self.initialize_variable("int","__evaluate.operation_counter")
+        self.assignment("__evaluate.operation_counter",0)
+        for _ in range(len(self.OPERATION)):
+            self.initialize_variable("int","__evaluate.is_operation")
+            if self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter")]] in value:
+                self.initialize_variable("string","__evaluate.value1")
+                self.initialize_variable("string","__evaluate.value2")
+                self.initialize_variable("int","__evaluate.op_index")
+                self.findchar(value,self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter")]],"__evaluate.op_index")
+                self.substr(value,0,self.V_VALUE[self.V_NAMES.find("__evaluate.op_index")],"__evaluate.value1")
+                self.substr(value,self.V_VALUE[self.V_NAMES.find("__evaluate.op_index")]+1,len(value),"__evaluate.value2")
+                self.evaluate(self.V_VALUE[self.V_NAMES.find("__evaluate.value1")],self.V_VALUE[self.V_NAMES.find("__evaluate.value2")],self.OPERATION[self.V_VALUE[self.V_NAMES.find("__evaluate.operation_counter")]],return_variable)
+                self.remove_variable("__evaluate.operation_counter")
+                return
+            self.increase("__evaluate.operation_counter")
+        self.remove_variable("__evaluate.operation_counter")
 
     def compile_line(self,code):
         self.initialize_variable("int","__compile_line.counter")
         self.assignment("__compile_line.counter",0)
         for _ in range(len(self.OPERATION)):
-            if self.OPERATION[self.V_VALUE[self.V_NAMES.find("__compile_line.counter")]] in code:
-                self.initialize_variable("int","__compile_line.op_index")
-                self.findchar(code,self.OPERATION[self.V_VALUE[self.V_NAMES.find("__compile_line.counter")]],"__compile_line.op_index")
-                self.initialize_variable("int","__compile_line.var1")
-                self.initialize_variable("int","__compile_line.var2")
-                self.substr(code,0,self.V_VALUE[self.V_NAMES.find("__compile_line.op_index")],"__compile_line.var1")
-                self.substr(code,self.V_VALUE[self.V_NAMES.find("__compile_line.op_index")]+1,len(code),"__compile_line.var2")
 
             self.increase("__compile_line.counter")
             
