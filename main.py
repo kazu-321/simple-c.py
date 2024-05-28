@@ -185,15 +185,13 @@ class compiler:
                 return
             self.increase("__evaluate.operation_counter"+str(id))
         self.remove_variable("__evaluate.operation_counter"+str(id))
-        
-
-    def compile_line(self,code):
-        self.initialize_variable("int","__compile_line.counter")
-        self.assignment("__compile_line.counter",0)
-        for _ in range(len(self.OPERATION)):
-
-            self.increase("__compile_line.counter")
-            
 
     def compile(self):
+        global CODE
         self.initialize_compiler()
+        self.initialize_variable("int","__compile.counter")
+        self.assignment("__compile.counter",0)
+        for _ in range(len(CODE)):
+            self.evaluate(CODE[self.V_VALUE[self.V_NAMES.find("__compile.counter")]],0,"")
+            self.increase("__compile.counter")
+        self.remove_variable("__compile.counter")
