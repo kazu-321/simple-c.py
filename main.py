@@ -204,18 +204,10 @@ class compiler:
         self.initialize_variable("int","__compile.types_counter")
         self.assignment("__compile.types_counter",0)
         for _ in range(len(self.TYPES)):
-            if self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]] in code:
-                self.initialize_variable("string","__compile.variable")
-                self.initialize_variable("string","__compile.value")
-                self.initialize_variable("int","__compile.variable_index")
-                self.findstr
-                self.evaluate(self.V_VALUE[self.V_NAMES.find("__compile.variable")],0,"__compile.value")
-                self.initialize_variable(self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]],self.V_VALUE[self.V_NAMES.find("__compile.variable")])
-                self.assignment(self.V_VALUE[self.V_NAMES.find("__compile.variable")],self.V_VALUE[self.V_NAMES.find("__compile.value")])
-                self.remove_variable("__compile.variable")
-                self.remove_variable("__compile.value")
-                self.remove_variable("__compile.variable_index")
-                self.remove_variable("__compile.types_counter")
+            self.initialize_variable("string","__compile.types_include")
+            self.findstr(code,self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]],"__compile.types_include")
+            if self.V_VALUE[self.V_NAME.find("__compile.types_include")]==1:
+                
                 return
             self.increase("__compile.types_counter")
         self.evaluate(code,0,"")
