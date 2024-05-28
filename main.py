@@ -208,8 +208,7 @@ class compiler:
                 self.initialize_variable("string","__compile.variable")
                 self.initialize_variable("string","__compile.value")
                 self.initialize_variable("int","__compile.variable_index")
-                self.findchar(code,self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]],"__compile.variable_index")
-                self.substr(code,self.V_VALUE[self.V_NAMES.find("__compile.variable_index")]+len(self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]]),len(code),"__compile.variable")
+                self.findstr
                 self.evaluate(self.V_VALUE[self.V_NAMES.find("__compile.variable")],0,"__compile.value")
                 self.initialize_variable(self.TYPES[self.V_VALUE[self.V_NAMES.find("__compile.types_counter")]],self.V_VALUE[self.V_NAMES.find("__compile.variable")])
                 self.assignment(self.V_VALUE[self.V_NAMES.find("__compile.variable")],self.V_VALUE[self.V_NAMES.find("__compile.value")])
