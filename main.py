@@ -33,12 +33,12 @@ class compiler:
     def remove_variable(self,V_NAMES):
         rm=self.V_NAMES.index(V_NAMES)
         if len(self.V_NAMES)>rm:
-            self.V_TYPES[rm]=self.V_TYPES[len(self.V_TYPES)]
-            self.V_NAMES[rm]=self.V_NAMES[len(self.V_NAMES)]
-            self.V_VALUE[rm]=self.V_VALUE[len(self.V_VALUE)]
-        self.V_TYPES[len(self.V_TYPES)].pop(-1)
-        self.V_NAMES[len(self.V_NAMES)].pop(-1)
-        self.V_VALUE[len(self.V_VALUE)].pop(-1)
+            self.V_TYPES[rm]=self.V_TYPES[len(self.V_TYPES)-1]
+            self.V_NAMES[rm]=self.V_NAMES[len(self.V_NAMES)-1]
+            self.V_VALUE[rm]=self.V_VALUE[len(self.V_VALUE)-1]
+        self.V_TYPES[len(self.V_TYPES)-1].pop(-1)
+        self.V_NAMES[len(self.V_NAMES)-1].pop(-1)
+        self.V_VALUE[len(self.V_VALUE)-1].pop(-1)
 
     def increase(self,V_NAMES):
         self.assignment(V_NAMES,self.V_VALUE[self.V_NAMES.index(V_NAMES)]+1)
